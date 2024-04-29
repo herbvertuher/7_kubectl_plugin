@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+print_row() {
+    printf "| %-15s | %-15s | %-40s | %-10s | %-10s |\n" "$1" "$2" "$3" "$4" "$5"
+}
+
+# Header
+printf "+-----------------+-----------------+------------------------------------------+------------+------------+\n"
+printf "| Resource        | Namespace       | Name                                     | CPU        | Memory     |\n"
+printf "+-----------------+-----------------+------------------------------------------+------------+------------+\n"
+
+# Retrieve resource usage statistics from Kubernetes
+kubectl top pod -n $1 | tail -n +2 | while read line
+do
+  # Extract CPU and memory usage from the output
+  NAME=$(echo $line | awk '{print $1}')
+  CPU=$(echo $line | awk '{print $2}')
+  MEMORY=$(echo $line | awk '{print $3}')
+
+  # Output the statistics to the console
+  # "Resource, Namespace, Name, CPU, Memory"
+  print_row "${RESOURCE_TYPE}" "$1" "${NAME}" "${CPU}" "${MEMORY}"
+done
+
+# Tail
+printf "+-----------------+-----------------+------------------------------------------+------------+------------+\n"
